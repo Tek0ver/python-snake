@@ -14,23 +14,62 @@ GAME_RESOLUTION = WINDOW_SIZE // GAME_GRID
 screen = pygame.display.set_mode((WINDOW_SIZE,WINDOW_SIZE))
 clock = pygame.time.Clock()
 
+font = pygame.font.SysFont(None, 24)
+text_color = (0,0,0)
+
+def setup_game():
+    global snake, food, score
+
+    snake = Snake()
+    food = Food()
+    score = Score()
+
+    print("game setup")
 
 def gameover():
-    print(f"Gameover, score : {score.score}")
-    pygame.quit()
-    exit()
+
+    text_1 = font.render(f"GAMEOVER", True, text_color)
+    text_2 = font.render(f"score : {str(score.score)}", True, text_color)
+    text_3 = font.render(f"replay : R", True, text_color)
+    text_4 = font.render(f"quit : Q", True, text_color)
+
+    snake.draw()
+    food.draw()
+
+    screen.blit(text_1, (0,60))
+    screen.blit(text_2, (0,80))
+    screen.blit(text_3, (0,140))
+    screen.blit(text_4, (0,160))
+
+    pygame.display.flip()
+
+    pause = True
+
+    while pause:
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
+                if event.key == pygame.K_r:
+                    pause = False
+
+                    # Reset game
+                    setup_game()
 
 
 class Score:
     def __init__(self):
         self.score = 0
-        self.font = pygame.font.SysFont(None, 24)
-        self.color = (0,0,0)
-        self.image = self.font.render(f"score : {str(self.score)}", True, self.color)
+        self.image = font.render(f"score : {str(self.score)}", True, text_color)
 
     def add(self, points):
         self.score += points
-        self.image = self.font.render(f"score : {str(self.score)}", True, self.color)
+        self.image = font.render(f"score : {str(self.score)}", True, text_color)
     
     def draw(self):
         screen.blit(self.image, (0,0))
@@ -65,11 +104,12 @@ class Snake:
         # store head position before moving to use position when moving body
         head_pos = self.rect_head.center
 
+        self.check_collisons() # check colisions at the coming position before moving
+
         # move head
         self.rect_head.move_ip(self.direction[0] * GAME_RESOLUTION,
                                self.direction[1] * GAME_RESOLUTION)
         
-        self.check_collisons()
 
         # move body
         if self.body:
@@ -80,18 +120,21 @@ class Snake:
 
     def check_collisons(self):
 
+        next_head_position = self.rect_head.move(self.direction[0] * GAME_RESOLUTION,
+                                                    self.direction[1] * GAME_RESOLUTION)
+
         # check for food
-        if self.rect_head.colliderect(food.rect):
+        if next_head_position.colliderect(food.rect):
             score.add(1)
             food.spawn()
             self.grow()
 
         # check for "out of screen"
-        elif self.rect_head.bottom > self.max_limit or self.rect_head.top < 0 or self.rect_head.left < 0 or self.rect_head.right > self.max_limit:
+        elif next_head_position.bottom > self.max_limit or next_head_position.top < 0 or next_head_position.left < 0 or next_head_position.right > self.max_limit:
             gameover()
 
         # check for tail
-        elif self.rect_head.collidelist(self.body) != -1:
+        elif next_head_position.collidelist(self.body) != -1:
             gameover()
 
     def draw(self):
@@ -133,9 +176,7 @@ class Food:
 
 running = True
 
-snake = Snake()
-food = Food()
-score = Score()
+setup_game()
 
 while running:
 
