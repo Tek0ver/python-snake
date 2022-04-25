@@ -4,9 +4,15 @@ from sys import exit
 
 pygame.init()
 
-screen = pygame.display.set_mode((500,500))
+# SETTINGS
+FPS = 5
+WINDOW_SIZE = 500 # Window size
+GAME_GRID = 10 # Number of square for the grid
+
+GAME_RESOLUTION = WINDOW_SIZE // GAME_GRID
+
+screen = pygame.display.set_mode((WINDOW_SIZE,WINDOW_SIZE))
 clock = pygame.time.Clock()
-FPS = 15
 
 
 def gameover():
@@ -33,7 +39,7 @@ class Score:
 class SnakeBody:
     def __init__(self, center):
 
-        self.image = pygame.Surface((10,10))
+        self.image = pygame.Surface((GAME_RESOLUTION,GAME_RESOLUTION))
         self.image.fill((93,175,29))
         self.rect = self.image.get_rect(center=center)
 
@@ -45,12 +51,14 @@ class SnakeBody:
 class Snake:
     def __init__(self):
 
-        self.sprite_head = pygame.Surface((10,10))
+        self.sprite_head = pygame.Surface((GAME_RESOLUTION,GAME_RESOLUTION))
         self.sprite_head.fill((55,87,30))
 
-        self.rect_head = self.sprite_head.get_rect(topleft=(250,250))
+        self.rect_head = self.sprite_head.get_rect(topleft=(GAME_GRID//2 * GAME_RESOLUTION,GAME_GRID//2 * GAME_RESOLUTION)) # Spawn at center
         self.body = []
-        self.direction = (0,1)
+        self.direction = (0,1) # Spawn heading to bottom
+
+        self.max_limit = screen.get_width() # Store to check collision with walls
 
     def move(self):
 
@@ -58,8 +66,8 @@ class Snake:
         head_pos = self.rect_head.center
 
         # move head
-        self.rect_head.move_ip(self.direction[0] * 10,
-                               self.direction[1] * 10)
+        self.rect_head.move_ip(self.direction[0] * GAME_RESOLUTION,
+                               self.direction[1] * GAME_RESOLUTION)
         
         self.check_collisons()
 
@@ -79,7 +87,7 @@ class Snake:
             self.grow()
 
         # check for "out of screen"
-        elif self.rect_head.bottom > 500 or self.rect_head.top < 0 or self.rect_head.left < 0 or self.rect_head.right > 500:
+        elif self.rect_head.bottom > self.max_limit or self.rect_head.top < 0 or self.rect_head.left < 0 or self.rect_head.right > self.max_limit:
             gameover()
 
         # check for tail
@@ -107,7 +115,7 @@ class Snake:
 class Food:
     def __init__(self):
 
-        self.image = pygame.Surface((10,10))
+        self.image = pygame.Surface((GAME_RESOLUTION,GAME_RESOLUTION))
         self.image.fill((194,46,46))
         self.rect = self.image.get_rect()
 
@@ -115,8 +123,8 @@ class Food:
 
     def spawn(self):
 
-        self.rect.topleft = (randint(0,49) * 10,
-                             randint(0,49) * 10)
+        self.rect.topleft = (randint(0,GAME_GRID - 1) * GAME_RESOLUTION,
+                             randint(0,GAME_GRID - 1) * GAME_RESOLUTION)
     
     def draw(self):
 
