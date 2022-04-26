@@ -137,7 +137,7 @@ class Snake:
             gameover()
 
         # check for tail
-        elif next_head_position.collidelist(self.body) != -1:
+        elif next_head_position.collidelist(self.body) not in [-1, 0]:
             gameover()
 
     def draw(self):
