@@ -5,7 +5,7 @@ from sys import exit
 pygame.init()
 
 # SETTINGS
-FPS = 1
+FPS = 5
 WINDOW_SIZE = 500 # Window size
 GAME_GRID = 10 # Number of square for the grid
 
@@ -197,6 +197,9 @@ class Food:
 
         self.rect.topleft = (randint(0,GAME_GRID - 1) * GAME_RESOLUTION,
                              randint(0,GAME_GRID - 1) * GAME_RESOLUTION)
+        
+        if self.rect.collidelist(snake.body) != -1 or self.rect.colliderect(snake.rect_head) is True:
+            self.spawn()
     
     def draw(self):
 
