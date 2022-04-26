@@ -5,7 +5,7 @@ from sys import exit
 pygame.init()
 
 # SETTINGS
-FPS = 5
+FPS = 1
 WINDOW_SIZE = 500 # Window size
 GAME_GRID = 10 # Number of square for the grid
 
@@ -95,7 +95,10 @@ class Snake:
 
         self.rect_head = self.sprite_head.get_rect(bottomright=(GAME_GRID//4 * GAME_RESOLUTION,GAME_GRID//4 * GAME_RESOLUTION)) # Spawn at center
         self.body = []
-        self.direction = (0,1) # Spawn heading to bottom
+
+        self.directions = [(0,-1), (1,0), (0,1), (-1,0)] # [ top, right, bottom, left]
+        self.direction_index = 2
+        self.direction = self.directions[self.direction_index] # Spawn heading to bottom
 
         self.max_limit = screen.get_width() # Store to check collision with walls
 
@@ -145,7 +148,33 @@ class Snake:
 
     def turn(self, direction):
 
-        self.direction = direction
+        if type(direction) is int: # for human input
+            # avoid death by going back (top to bottom, left to right, etc)
+            if (direction == 0 and self.direction_index != 2)\
+            or (direction == 2 and self.direction_index != 0)\
+            or (direction == 3 and self.direction_index != 1)\
+            or (direction == 1 and self.direction_index != 3):
+                self.direction_index = direction
+                self.direction = self.directions[self.direction_index]
+
+        elif type(direction) is str: # for ai input
+            if direction == 'left':
+                if self.direction_index == 0:
+                    self.direction_index = 3
+                else:
+                    self.direction_index -= 1
+            if direction == 'right':
+                if self.direction_index == 3:
+                    self.direction_index = 0
+                else:
+                    self.direction_index += 1
+                    
+            # then make the turn
+            self.direction = self.directions[self.direction_index]
+
+        # self.directions = [(0,-1), (1,0), (0,1), (-1,0)] # [ top, right, bottom, left]
+        # self.direction_index = 2
+        # self.direction = self.directions[self.direction_index] # Spawn heading to bottom        
 
     def grow(self):
 
@@ -175,6 +204,7 @@ class Food:
 
 
 running = True
+input_ready = True
 
 setup_game()
 
@@ -186,14 +216,25 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            elif event.key == pygame.K_UP:
-                snake.turn((0,-1))
-            elif event.key == pygame.K_DOWN:
-                snake.turn((0,1))
-            elif event.key == pygame.K_LEFT:
-                snake.turn((-1,0))
-            elif event.key == pygame.K_RIGHT:
-                snake.turn((1,0))
+            elif input_ready:
+                if event.key == pygame.K_UP:
+                    snake.turn(0)
+                    input_ready = False
+                elif event.key == pygame.K_DOWN:
+                    snake.turn(2)
+                    input_ready = False
+                elif event.key == pygame.K_LEFT:
+                    snake.turn(3)
+                    input_ready = False
+                elif event.key == pygame.K_RIGHT:
+                    snake.turn(1)
+                    input_ready = False
+                elif event.key == pygame.K_j:
+                    snake.turn('left')
+                    input_ready = False
+                elif event.key == pygame.K_k:
+                    snake.turn('right')
+                    input_ready = False
 
     screen.fill((200,200,200))
 
@@ -207,5 +248,6 @@ while running:
     pygame.display.flip()
 
     clock.tick(FPS)
+    input_ready = True
 
 pygame.quit()
