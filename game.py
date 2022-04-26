@@ -93,7 +93,7 @@ class Snake:
         self.sprite_head = pygame.Surface((GAME_RESOLUTION,GAME_RESOLUTION))
         self.sprite_head.fill((55,87,30))
 
-        self.rect_head = self.sprite_head.get_rect(topleft=(GAME_GRID//2 * GAME_RESOLUTION,GAME_GRID//2 * GAME_RESOLUTION)) # Spawn at center
+        self.rect_head = self.sprite_head.get_rect(bottomright=(GAME_GRID//4 * GAME_RESOLUTION,GAME_GRID//4 * GAME_RESOLUTION)) # Spawn at center
         self.body = []
         self.direction = (0,1) # Spawn heading to bottom
 
