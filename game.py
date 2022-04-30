@@ -18,16 +18,32 @@ class Game:
 
         self.fps = FPS
 
+    def draw_game(self, snake, food):
+        self.screen.fill((200,200,200))
+        snake.draw(self.screen)
+        food.draw(self.screen)
+        pygame.display.flip()
+
     def run(self, genomes, config):
 
         for genome_id, genome in genomes:
+
+            if DEBUG:
+                    print('new snake')
+
             genome.fitness = 0
             net = neat.nn.FeedForwardNetwork.create(genome, config)
 
             snake = Snake()
             food = Food(snake)
 
-            last_decision = None
+            # draw first frame
+            self.draw_game(snake, food)
+            self.clock.tick(self.fps)
+
+            last_decision = -1
+
+            hunger = GAME_GRID ** 2
 
             running = True
             input_ready = True
@@ -42,16 +58,13 @@ class Game:
                         if event.key == pygame.K_ESCAPE:
                             pygame.quit()
                             exit()
-                        if event.key == pygame.K_SPACE: # stop AI manually when stuck in loop
-                            genome.fitness = PENALTY_SPACE_BAR
-                            running = False
-                            break
                         if event.key == pygame.K_s: # slow time
                             if self.fps == FPS:
-                                self.fps = 5
+                                self.fps = 1
                             else:
                                 self.fps = FPS
-
+                        
+                        # for human inputs
                         elif input_ready:
                             if event.key == pygame.K_UP:
                                 snake.turn('up')
@@ -80,41 +93,37 @@ class Game:
                 elif decision == 3:
                     snake.turn('right')
 
+                if DEBUG:
+                    print(snake.make_inputs(food))
+                    pause = input()
+
                 # avoid stuck in left/right/left/right/... or up/down/up/down/...
                 if decision == 0 and last_decision == 1:
-                    print('stuck')
                     genome.fitness = PENALTY_HARD_STUCK
-                    running = False
                     break
                 elif decision == 1 and last_decision == 0:
-                    print('stuck')
                     genome.fitness = PENALTY_HARD_STUCK
-                    running = False
                     break
                 elif decision == 2 and last_decision == 3:
-                    print('stuck')
                     genome.fitness = PENALTY_HARD_STUCK
-                    running = False
                     break
                 elif decision == 3 and last_decision == 2:
-                    print('stuck')
                     genome.fitness = PENALTY_HARD_STUCK
-                    running = False
                     break
                     
                 last_decision = decision
 
-                self.screen.fill((200,200,200))
+                # avoir stuck in loop
+                hunger -= 1
+                if hunger <= 0:
+                    genome.fitness = PENALTY_HUNGER_DEATH
+                    break
 
                 if snake.update(food) == 'eat food':
                     # AI reward if alive
                     genome.fitness += REWARD_EAT_FOOD
                 
-                snake.draw(self.screen)
-
-                food.draw(self.screen)
-
-                pygame.display.flip()
+                self.draw_game(snake, food)
 
                 self.clock.tick(self.fps)
                 input_ready = True

@@ -17,17 +17,20 @@ class Snake:
         self.alive = True
 
         self.rect = self.image.get_rect(bottomright=(
-            GAME_GRID//2 * GAME_RESOLUTION,
-            GAME_GRID//2 * GAME_RESOLUTION)) # Spawn at center
+            (GAME_GRID//2 + 1) * GAME_RESOLUTION,
+            (GAME_GRID//2 + 1) * GAME_RESOLUTION)) # Spawn at center
         self.direction = (0,1) # spawn heading to bottom
 
     def update(self, food):
+
+        eat = False
 
         # store head position before moving to use position when moving body
         head_pos = self.rect.center
 
         # check colisions at the coming position before moving
-        self.check_collisions(food)
+        if self.check_collisions(food) == 'food':
+            eat = True
 
         # if snake is dead, stop here
         if self.alive is False:
@@ -43,6 +46,9 @@ class Snake:
             del self.tail[0]
             # "move" first
             self.tail.append(Tail(head_pos))
+        
+        if eat is True:
+            return 'eat food'
 
     def draw(self, screen):
 
@@ -61,6 +67,7 @@ class Snake:
         if next_position == 2:
             food.spawn(self)
             self.grow()
+            return 'food'
 
         # check for "out of screen"
         elif next_position == 1:
@@ -68,6 +75,9 @@ class Snake:
 
     def turn(self, direction):
         
+        if DEBUG:
+            print(direction)
+
         if direction == 'up':
             self.direction = (0,-1)
         elif direction == 'down':
@@ -78,6 +88,10 @@ class Snake:
             self.direction = (1,0)
 
     def grow(self):
+
+        if NO_GROW:
+            return None
+
         # tail grows of 1 unit
         if self.tail:
             self.tail.insert(0, Tail(self.tail[-1].rect.center))
@@ -85,15 +99,16 @@ class Snake:
             self.tail.append(Tail(self.rect.center))
 
     def sensor(self, food, rect):
+        
         # 0 : nothing
         # 1 : wall or tail
         # 2 : food
 
         # walls
-        if rect.bottom > WINDOW_SIZE\
-        or rect.top < 0\
-        or rect.left < 0\
-        or rect.right > WINDOW_SIZE:
+        if rect.centerx < 0\
+        or rect.centerx > WINDOW_SIZE\
+        or rect.centery < 0\
+        or rect.centery > WINDOW_SIZE:
             return 1
         # tail
         elif rect.collidelist(self.tail) != -1:
@@ -134,7 +149,7 @@ class Snake:
         # food at same level of snake head
         elif food_direction_x == 0:
             inputs.append(0)
-        
+
         return inputs
 
 

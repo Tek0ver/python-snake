@@ -14,22 +14,22 @@ def run(config_path):
     p = neat.Population(config)
 
     # to load from checkpoint
-    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-99')
+    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-639')
 
     # add a stdout reporter to show progress in the terminal
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(10))
+    p.add_reporter(neat.Checkpointer(100))
 
     # run for up to 100 generations
-    winner = p.run(game.run, 100)
+    winner = p.run(game.run, 1000)
     # save the best AI
     with open("best.pickle", "wb") as f:
         pickle.dump(winner, f)
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config-neat-00.txt")
+    config_path = os.path.join(local_dir, "config-neat-01.txt")
     game = Game()
     run(config_path)

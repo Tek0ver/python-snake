@@ -13,7 +13,10 @@ class Food:
 
     def spawn(self, snake):
 
-        self.rect.topleft = (randint(0,GAME_GRID - 1) * GAME_RESOLUTION,
+        if NO_FOOD:
+            self.rect.topleft = (-100,-100)
+        else:
+            self.rect.topleft = (randint(0,GAME_GRID - 1) * GAME_RESOLUTION,
                              randint(0,GAME_GRID - 1) * GAME_RESOLUTION)
         
         if self.rect.collidelist(snake.tail) != -1 or self.rect.colliderect(snake.rect) is True:
