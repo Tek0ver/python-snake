@@ -14,7 +14,7 @@ def run(config_path):
     p = neat.Population(config)
 
     # to load from checkpoint
-    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-639')
+    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-99')
 
     # add a stdout reporter to show progress in the terminal
     p.add_reporter(neat.StdOutReporter(True))
@@ -30,6 +30,6 @@ def run(config_path):
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config-neat-01.txt")
+    config_path = os.path.join(local_dir, "config-neat-02.txt")
     game = Game()
     run(config_path)

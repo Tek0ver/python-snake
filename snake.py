@@ -129,26 +129,29 @@ class Snake:
                                   direction[1] * GAME_RESOLUTION)
             inputs.append(self.sensor(food, rect))
 
-        food_direction_y = food.rect.y - self.rect.y
-        food_direction_x = food.rect.x - self.rect.x
-        # food above snake head
-        if food_direction_y < 0:
-            inputs.append(1)
-        # food under snake head
-        elif food_direction_y > 0:
-            inputs.append(-1)
-        # food at same level of snake head
-        elif food_direction_y == 0:
-            inputs.append(0)
-        # food on left of snake head
-        if food_direction_x < 0:
-            inputs.append(-1)
-        # food on right of snake head
-        elif food_direction_x > 0:
-            inputs.append(1)
-        # food at same level of snake head
-        elif food_direction_x == 0:
-            inputs.append(0)
+        if NO_FOOD is False:
+            food_direction_y = food.rect.y - self.rect.y
+            food_direction_x = food.rect.x - self.rect.x
+            # food above snake head
+            if food_direction_y < 0:
+                inputs.append(1)
+            else:
+                inputs.append(0)
+            # food under snake head
+            if food_direction_y > 0:
+                inputs.append(1)
+            else:
+                inputs.append(0)
+            # food on left of snake head
+            if food_direction_x < 0:
+                inputs.append(1)
+            else:
+                inputs.append(0)
+            # food on right of snake head
+            if food_direction_x > 0:
+                inputs.append(1)
+            else:
+                inputs.append(0)
 
         return inputs
 

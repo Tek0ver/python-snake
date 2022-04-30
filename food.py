@@ -14,7 +14,7 @@ class Food:
     def spawn(self, snake):
 
         if NO_FOOD:
-            self.rect.topleft = (-100,-100)
+            self.rect.topleft = (-1000,-1000)
         else:
             self.rect.topleft = (randint(0,GAME_GRID - 1) * GAME_RESOLUTION,
                              randint(0,GAME_GRID - 1) * GAME_RESOLUTION)

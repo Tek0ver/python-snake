@@ -25,11 +25,12 @@ class Game:
         pygame.display.flip()
 
     def run(self, genomes, config):
+        global DEBUG
 
         for genome_id, genome in genomes:
 
             if DEBUG:
-                    print('new snake')
+                print('new snake')
 
             genome.fitness = 0
             net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -43,7 +44,7 @@ class Game:
 
             last_decision = -1
 
-            hunger = GAME_GRID ** 2
+            hunger = GAME_GRID ** 3
 
             running = True
             input_ready = True
@@ -60,9 +61,14 @@ class Game:
                             exit()
                         if event.key == pygame.K_s: # slow time
                             if self.fps == FPS:
-                                self.fps = 1
+                                self.fps = 2
                             else:
                                 self.fps = FPS
+                        if event.key == pygame.K_d: # debug
+                            if DEBUG is True:
+                                DEBUG = False
+                            else:
+                                DEBUG = True
                         
                         # for human inputs
                         elif input_ready:
@@ -99,16 +105,16 @@ class Game:
 
                 # avoid stuck in left/right/left/right/... or up/down/up/down/...
                 if decision == 0 and last_decision == 1:
-                    genome.fitness = PENALTY_HARD_STUCK
+                    genome.fitness -= PENALTY_HARD_STUCK
                     break
                 elif decision == 1 and last_decision == 0:
-                    genome.fitness = PENALTY_HARD_STUCK
+                    genome.fitness -= PENALTY_HARD_STUCK
                     break
                 elif decision == 2 and last_decision == 3:
-                    genome.fitness = PENALTY_HARD_STUCK
+                    genome.fitness -= PENALTY_HARD_STUCK
                     break
                 elif decision == 3 and last_decision == 2:
-                    genome.fitness = PENALTY_HARD_STUCK
+                    genome.fitness -= PENALTY_HARD_STUCK
                     break
                     
                 last_decision = decision
@@ -116,12 +122,13 @@ class Game:
                 # avoir stuck in loop
                 hunger -= 1
                 if hunger <= 0:
-                    genome.fitness = PENALTY_HUNGER_DEATH
+                    genome.fitness -= PENALTY_HUNGER_DEATH
                     break
 
                 if snake.update(food) == 'eat food':
                     # AI reward if alive
                     genome.fitness += REWARD_EAT_FOOD
+                    hunger = GAME_GRID ** 2
                 
                 self.draw_game(snake, food)
 
@@ -136,3 +143,9 @@ class Game:
 
                 # AI reward if alive
                 genome.fitness += REWARD_ALIVE_ONE_MORE_FRAME
+
+                if DEBUG:
+                    print(genome.fitness)
+        
+            if DEBUG:
+                print(f"end, fitness : {genome.fitness}")
