@@ -16,6 +16,8 @@ class Game:
         font = pygame.font.SysFont(None, 24)
         text_color = (0,0,0)
 
+        self.fps = FPS
+
     def run(self, genomes, config):
 
         for genome_id, genome in genomes:
@@ -44,6 +46,12 @@ class Game:
                             genome.fitness = PENALTY_SPACE_BAR
                             running = False
                             break
+                        if event.key == pygame.K_s: # slow time
+                            if self.fps == FPS:
+                                self.fps = 5
+                            else:
+                                self.fps = FPS
+
                         elif input_ready:
                             if event.key == pygame.K_UP:
                                 snake.turn('up')
@@ -108,7 +116,7 @@ class Game:
 
                 pygame.display.flip()
 
-                self.clock.tick(FPS)
+                self.clock.tick(self.fps)
                 input_ready = True
 
                 # break if snake is dead

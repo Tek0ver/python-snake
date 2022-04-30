@@ -14,13 +14,13 @@ def run(config_path):
     p = neat.Population(config)
 
     # to load from checkpoint
-    # p = neat.Checkpointer.restore_checkpoint('checkpoint-name')
+    # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-99')
 
     # add a stdout reporter to show progress in the terminal
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(5))
+    p.add_reporter(neat.Checkpointer(10))
 
     # run for up to 100 generations
     winner = p.run(game.run, 100)
