@@ -107,7 +107,7 @@ class Game:
                 backwards_directions = {
                     0: 1, 1: 0, 2: 3, 3: 2
                 }
-                if decision == backwards_directions[decision]:
+                if last_decision == backwards_directions[decision]:
                     genome.fitness -= PENALTY_HARD_STUCK
                     break
                     
