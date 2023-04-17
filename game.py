@@ -104,16 +104,10 @@ class Game:
                     pause = input()
 
                 # avoid stuck in left/right/left/right/... or up/down/up/down/...
-                if decision == 0 and last_decision == 1:
-                    genome.fitness -= PENALTY_HARD_STUCK
-                    break
-                elif decision == 1 and last_decision == 0:
-                    genome.fitness -= PENALTY_HARD_STUCK
-                    break
-                elif decision == 2 and last_decision == 3:
-                    genome.fitness -= PENALTY_HARD_STUCK
-                    break
-                elif decision == 3 and last_decision == 2:
+                backwards_directions = {
+                    0: 1, 1: 0, 2: 3, 3: 2
+                }
+                if decision == backwards_directions[decision]:
                     genome.fitness -= PENALTY_HARD_STUCK
                     break
                     
